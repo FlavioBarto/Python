@@ -1,23 +1,33 @@
 from collections import defaultdict
 
+dicionario = {
+    'nome': 'flavio',
+    'idade': 19,
+    'cidade': 'londrina'
+}
 
-pedidos = [
-    ('Ana',    'camisa'),
-    ('Bruno',  'calça'),
-    ('Ana',    'boné'),
-    ('Ana',    'chinelo'),
-    ('Ana',    'vestido'),
-    ('Bruno',    'camisa')
-]
+print(dicionario.keys())
+print(list(dicionario.keys()))
+print(dicionario.values())
+print(list(dicionario.values()))
 
+print(dicionario['nome'])
+print(dicionario['cidade'])
+dicionario['cidade'] = 'lisboa'
+print(dicionario['cidade'])
+dicionario['solteiro'] = 'sim'
+print(dicionario['solteiro'])
+print(dicionario)
 
-agrupado = defaultdict(list)
+#------------------------------------
 
+dicionario['organiza'] = ['reunião', 'kambam', 'RH']
+dicionario['organiza'].append('pasta')
+print(dicionario)
+#------------------------------------
 
-for cliente, produto in pedidos:
-    agrupado[cliente].append(produto)
-
-
-print(dict(agrupado))
-print(agrupado)
-# {'Ana': ['camisa', 'boné'], 'Bruno': ['calça']}
+natureza = defaultdict(list)
+print(natureza)
+natureza['fauna'].extend(['papagaio', 'cachorro', 'gato'])
+print(natureza)
+print(natureza['fauna'][2])
