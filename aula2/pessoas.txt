@@ -1,0 +1,3 @@
+nome: Ana, idade: 19
+nome: Flavio, idade: 20
+nome: Gustavo, idade: 12
