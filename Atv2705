@@ -1,0 +1,167 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import streamlit as st
+import pandas as pd
+
+
+df = pd.read_csv('C:/Users/Aluno/Desktop/python/dados_alunos_escola.csv', sep=',', encoding='utf-8')
+colunas_legiveis = {
+    'Portugues': 'nota_portugues',
+    'Matematica': 'nota_matematica',
+    'Ciencias': 'nota_ciencias'
+}
+
+coluna = st.sidebar.selectbox("Escolha a materia que quer ver: ", list(colunas_legiveis.keys()))
+coluna_real = colunas_legiveis[coluna]
+#Calcule a média, mediana, moda, variância, amplitude e desvio padrão das notas de matemática, português e ciências.
+
+
+st.subheader(f"Media de Notas", divider=True )
+st.write( f"Portugues: {df['nota_portugues'].mean():.2f}")
+st.write(f"Matematica: {df['nota_matematica'].mean():.2f}")
+st.write(f"Ciencias: {df['nota_ciencias'].mean():.2f}")
+
+
+st.subheader(f"Mediana de Notas", divider=True )
+st.write("Portugues:", df['nota_portugues'].median())
+st.write("Matematica: ", df['nota_matematica'].median())
+st.write("Ciencias: ", df['nota_ciencias'].median())
+
+
+st.subheader(f"Moda de Notas", divider=True )
+st.write("Portugues:", df['nota_portugues'].mode())
+st.write("Matematica: ", df['nota_matematica'].mode())
+st.write("Ciencias: ", df['nota_ciencias'].mode())
+
+
+st.subheader(f"Desvio padrão de Notas", divider=True )
+st.write(f"Portugues: {df['nota_portugues'].std():.3}")
+st.write(f"Matematica: {df['nota_matematica'].std():.3}")
+st.write(f"Ciencias: {df['nota_ciencias'].std():.3}")
+
+
+st.subheader(f"Variância de Notas", divider=True )
+st.write(f"Portugues: {df['nota_portugues'].var():.3}")
+st.write(f"Matematica: {df['nota_matematica'].var():.3}")
+st.write(f"Ciencias: {df['nota_ciencias'].var():.3}")
+
+
+st.subheader(f"Amplitude de Notas", divider=True )
+st.write("Portugues: ", df['nota_portugues'].max() - df['nota_portugues'].min())
+st.write("Matematica: ", df['nota_matematica'].max() - df['nota_matematica'].min())
+st.write("Ciencias: ", df['nota_ciencias'].max() - df['nota_ciencias'].min())
+
+
+#-----------------------------------------------------------------------------------------
+#Qual é a frequência média dos alunos por série?
+
+st.subheader(f"Media de frequencia", divider=True)
+frequenciaMedia = df.groupby('serie')['frequencia_%'].mean()
+
+st.write(f"Alunos do 1º Ano: {frequenciaMedia.get('1º Ano', 0):.2f}%")
+st.write(f"Alunos do 2º Ano: {frequenciaMedia.get('2º Ano', 0):.2f}%")
+st.write(f"Alunos do 3º Ano: {frequenciaMedia.get('3º Ano', 0):.2f}%")
+#------------------------------------------------------------------------------------------
+#Filtre os alunos com frequência abaixo de 75% e calcule a média geral deles.
+
+st.subheader(f"Media de frequencia a baixo de 75%", divider=True)
+frequencia75 = df[df['frequencia_%'] <= 75]['frequencia_%']
+media75 = frequencia75.mean()
+st.write(f"Media de Alunos abaixo de 75%:  {media75:.2f}%")
+
+#------------------------------------------------------------------------------------------
+#Crie a seguinte classificação:
+    #a. Nota menor que 3,0 = reprovado
+    #b. Nota menor que 6,0 = exame
+    #c. Nota acima de 6,0 = aprovado
+
+st.subheader(f"Classificação das notas dos alunos", divider=True)
+
+def classifica(nota):
+    if nota < 3.0:
+        return 'reprovado'
+    elif nota > 3.0 and nota < 6.0:
+        return 'exame'
+    else:
+        return 'aprovado'
+    
+df[f'classificacao{coluna_real}'] = df[coluna_real].apply(classifica)
+
+st.write(df[[coluna_real, f'classificacao{coluna_real}']])
+#-------------------------------------------------------------------------------------------
+#Quantos alunos possuem a nota menor que 3,0?
+st.subheader(f"alunos com nota menor que 3", divider=True)
+reprovados = (df[coluna_real] <= 3.0).sum()
+st.write(f'Essa é a quantidade de alunos reprovados na materia de {coluna}: {reprovados}')
+#-------------------------------------------------------------------------------------------
+#Quantos alunos possuem a nota menor que 5,0?
+st.subheader(f"alunos com nota menor que 5", divider=True)
+exames = ((df[coluna_real] >= 3.1) & (df[coluna_real] < 5.0)).sum()
+st.write(f'Essa é a quantidade de alunosem exame na materia de {coluna}: {exames}')
+#-------------------------------------------------------------------------------------------
+#Quantos alunos possuem a nota menor que 7,0?
+st.subheader(f"alunos com nota menor que 7", divider=True)
+aprovados = ((df[coluna_real] >= 5.1) & (df[coluna_real] < 7.0)).sum()
+st.write(f'Essa é a quantidade de alunosem exame na materia de {coluna}: {aprovados}')
+#-------------------------------------------------------------------------------------------
+#Quantos alunos possuem a nota menor que 9,0?
+st.subheader(f"alunos com nota menor que 9", divider=True)
+notaBoa = ((df[coluna_real] >= 7.1) & (df[coluna_real] < 9.0)).sum()
+st.write(f'Essa é a quantidade de alunosem exame na materia de {coluna}: {notaBoa}')
+#-------------------------------------------------------------------------------------------
+#Quantos alunos possuem a nota igual a 10,0?
+st.subheader(f"alunos com nota igual a 10", divider=True)
+notaMaxima = (df[coluna_real] == 10.0).sum()
+st.write(f'Essa é a quantidade de alunosem exame na materia de {coluna}: {notaMaxima}')
+#-------------------------------------------------------------------------------------------
+#Qual cidade tem a melhor nota em Matemática, português e ciências? E a Pior nota?
+st.subheader(f"A cidade com a melhor nota de {coluna} e pior nota: ", divider=True)
+pior_cidade = df[coluna_real].idxmin()
+pior = df.loc[pior_cidade, 'cidade']
+melhor_cidade = df[coluna_real].idxmax()
+melhor = df.loc[melhor_cidade, 'cidade']
+
+st.write(f"essas são a pior e melhor cidade na materia {coluna}:")
+st.write(f"pior: {pior}")
+st.write(f"melhor: {melhor}")
+#-------------------------------------------------------------------------------------------
+#Crie um histograma das notas de todas as matérias.
+st.subheader(f"histograma das notas de {coluna}", divider=True)
+
+fig, ax = plt.subplots(figsize=(30,13))
+sns.countplot(x=coluna_real, data=df, ax=ax)
+st.pyplot(fig)
+
+
+#-------------------------------------------------------------------------------------------
+#Gere um boxplot comparando notas de português por série.
+
+st.subheader(f"boxplot das notas de {coluna}", divider=True)
+fig, ax = plt.subplots(figsize=(20, 15))
+sns.boxplot(x=coluna_real, y='serie', data=df, ax=ax)
+plt.title("Distribuição de nota por serie")
+plt.ylabel("serie")
+plt.xlabel("notas")
+st.pyplot(fig)
+#-------------------------------------------------------------------------------------------
+#Crie um gráfico de barras com a quantidade de alunos por cidade.
+st.subheader(f"gráfico de barras das notas de {coluna} por cidade", divider=True)
+
+fig, ax = plt.subplots(figsize=(20, 15))
+sns.countplot(x='cidade', hue=coluna_real, data=df, ax=ax)
+plt.title("Distribuição de alunos por cidade")
+plt.ylabel("nota")
+plt.xlabel("cidade")
+st.pyplot(fig)
+#--------------------------------------------------------------------------------------------
+#Faça um gráfico de dispersão entre frequencia_% e nota por matéria.
+st.subheader(f"gráfico de dispersão das frequencias por alunos e notas por materia", divider=True)
+
+fig, ax = plt.subplots(figsize=(20, 15))
+sns.scatterplot(x=coluna_real, y='frequencia_%', data=df, ax=ax)
+plt.title("Distribuição de frequencia por materia")
+plt.ylabel("Frequencia")
+plt.xlabel("Nota")
+st.pyplot(fig)
+
+
